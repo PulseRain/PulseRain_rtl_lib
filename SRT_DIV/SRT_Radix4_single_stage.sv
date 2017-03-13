@@ -19,7 +19,7 @@
 //=============================================================================
 // References:
 //  [1] Building Embedded Systems: Programmable Hardware, 1st Edition, 
-//      by Changyi Gu, 07/2017
+//      by Changyi Gu, 07/2016
 //=============================================================================
 
 `default_nettype none
