@@ -66,7 +66,7 @@ module SRT_Radix4_single #(parameter DATA_WIDTH) (
     wire    unsigned [3 : 0]                            top_4bits;
     
     assign divisor_signed = {1'b0, divisor};
-    assign divisor_signed_neg = ~divisor_signed + 1;
+    assign divisor_signed_neg = ~divisor_signed + ($size(divisor_signed_neg))'(1);
     //assign qd = q_out * divisor_signed;
     
     

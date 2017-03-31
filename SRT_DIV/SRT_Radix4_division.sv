@@ -92,9 +92,9 @@ module SRT_Radix4_division #(parameter DATA_WIDTH = 8) (
             if (!reset_n) begin
                 shift_counter <= 0;
             end else if (ctl_load_shift_counter) begin
-                shift_counter <= DATA_WIDTH / 2;
+                shift_counter <= ($size(shift_counter))'(DATA_WIDTH / 2);
             end else if (shift_counter) begin
-                shift_counter <= shift_counter - 1;
+                shift_counter <= shift_counter - ($size(shift_counter))'(1);
             end
         end
         
@@ -177,7 +177,7 @@ module SRT_Radix4_division #(parameter DATA_WIDTH = 8) (
             if (!reset_n) begin
                 partial_remainder <= 0;
             end else if (enable_in) begin
-                partial_remainder <= {(DATA_WIDTH)'(0), dividend};
+                partial_remainder <= ($size(partial_remainder))'({(DATA_WIDTH)'(0), dividend});
             end else if (ctl_partial_remainder_update) begin
                 partial_remainder <= partial_remainder_out;
             end
@@ -189,8 +189,7 @@ module SRT_Radix4_division #(parameter DATA_WIDTH = 8) (
         
         
         assign quotient = quotient_ii;
-        //assign remainder = dividend - quotient_ii * divisor;
-                
+                       
         always_ff @(posedge clk, negedge reset_n) begin
             if (!reset_n) begin
         //      quotient <= 0;
@@ -215,7 +214,7 @@ module SRT_Radix4_division #(parameter DATA_WIDTH = 8) (
     // FSM
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 
-        enum {S_IDLE, S_RUN, S_DONE} states;
+        enum {S_IDLE, S_RUN, S_DONE} states = 0;
                 
         localparam FSM_NUM_OF_STATES = states.num();
         logic [FSM_NUM_OF_STATES - 1:0] current_state = 0, next_state;
