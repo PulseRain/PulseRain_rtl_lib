@@ -26,6 +26,8 @@
     parameter int FLASH_LOADER_BUF_FILL_BIT_INDEX    = 3;
     parameter int FLASH_LOADER_SAVE_BEGIN_BIT_INDEX  = 4;
     parameter int FLASH_LOADER_SAVE_END_BIT_INDEX    = 5;
+    parameter int FLASH_LOADER_FLASH_READ_BIT_INDEX  = 6;
+    
     
     parameter int FLASH_LOADER_ONCHIP_FLASH_BITS = 17;
     parameter int FLASH_LOADER_SEGMENT_SIZE_BYTES = 2048;
@@ -77,7 +79,10 @@ extern module wb_flash_loader #(REG_ADDR_DATA0,
         output  wire                                    done_flag,
         
         output  logic                                   ping_busy,
-        output  logic                                   pong_busy
+        output  logic                                   pong_busy,
+        
+        output  logic unsigned [1 : 0]                  flash_buffer_ping_state_out,
+        output  logic unsigned [1 : 0]                  flash_buffer_pong_state_out
         
         
 );

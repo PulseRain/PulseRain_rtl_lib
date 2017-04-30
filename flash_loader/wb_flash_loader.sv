@@ -67,7 +67,11 @@ module wb_flash_loader #(REG_ADDR_DATA0,
         output  wire                                    done_flag,
         
         output  logic                                   ping_busy,
-        output  logic                                   pong_busy
+        output  logic                                   pong_busy,
+        
+        output  logic unsigned [1 : 0]                  flash_buffer_ping_state_out,
+        output  logic unsigned [1 : 0]                  flash_buffer_pong_state_out
+        
         
         
 );
@@ -83,10 +87,12 @@ module wb_flash_loader #(REG_ADDR_DATA0,
         
         wire  unsigned [31 : 0]                                 csr_data;
         
-        logic unsigned [31 : 0]                     csr_read_data_reg;
+        logic unsigned [31 : 0]                     read_data_reg;
+        logic                                       csr0_data1;
+        logic                                       flash_read;
+        logic                                       flash_read_d1;
         
-        
-        logic unsigned [DATA_WIDTH - 1 : 0]                     csr_control_reg;
+        logic unsigned [DATA_WIDTH - 1 : 0]         csr_control_reg;
         logic                                       csr_read;
         logic                                       csr_read_d1;
         logic                                       csr_write;
@@ -97,8 +103,8 @@ module wb_flash_loader #(REG_ADDR_DATA0,
         wire                                        data_readdatavalid;
         
         logic                                       we;
-		//  wire													 re;
-        
+
+        //  wire                                                     re;
         
         logic unsigned [DATA_WIDTH - 1 : 0]         write_addr;
         wire  unsigned [DATA_WIDTH - 1 : 0]         read_addr;
@@ -134,6 +140,7 @@ module wb_flash_loader #(REG_ADDR_DATA0,
         logic                                       ctl_flip_active_ping0_pong1;
         logic                                       ctl_init_active_ping0_pong1;
         
+        
         logic                                       active_ping0_pong1;
         logic unsigned [FLASH_LOADER_BUFFER_BITS - 2 : 0] segment_addr_counter;
         
@@ -144,6 +151,9 @@ module wb_flash_loader #(REG_ADDR_DATA0,
         logic                                       flash_buffer_enable_out_d1;
         logic                                       done;
         logic                                       done_reg;
+        logic                                       data_readdatavalid_reg;
+        logic unsigned [7 : 0]                      csr_return;
+        logic                                       active_flag_reg;
         
     //=======================================================================
     //  data register / output mux
@@ -216,9 +226,10 @@ module wb_flash_loader #(REG_ADDR_DATA0,
                 csr_write       <= 0;
                 buf_fill        <= 0;
                 buf_fill_start  <= 0;
-                flash_save_begin_addr <= 0;
-                flash_save_end_addr   <= 0;
-                done_reg <= 0;
+                flash_save_begin_addr  <= 0;
+                flash_save_end_addr    <= 0;
+                flash_read             <= 0;
+                done_reg               <= 0;
                 
             end else begin
                 csr_addr  <= csr_control_reg [FLASH_LOADER_CSR_ADDR_BIT_INDEX];
@@ -228,6 +239,7 @@ module wb_flash_loader #(REG_ADDR_DATA0,
                 buf_fill_start <= buf_fill;
                 flash_save_begin_addr <= csr_control_reg [FLASH_LOADER_SAVE_BEGIN_BIT_INDEX];
                 flash_save_end_addr   <= csr_control_reg [FLASH_LOADER_SAVE_END_BIT_INDEX];
+                flash_read            <= csr_control_reg [FLASH_LOADER_FLASH_READ_BIT_INDEX];
                 
                 if (buf_fill) begin
                     done_reg <= 0;
@@ -240,13 +252,36 @@ module wb_flash_loader #(REG_ADDR_DATA0,
         
         always_ff @(posedge clk, negedge reset_n) begin : csr_read_data_reg_proc
             if (!reset_n) begin
-                csr_read_d1         <= 0;
-                csr_read_data_reg   <= 0;
+                csr_read_d1   <= 0;
+                read_data_reg <= 0;
+                csr0_data1    <= 0;
+                flash_read_d1 <= 0;
+                data_readdatavalid_reg <= 0;
+                
+                csr_return    <= 0;
             end else begin
+                
+                csr_return  <= {3'b000, data_readdatavalid_reg, ping_busy, pong_busy, done_flag, active_flag}; 
                 csr_read_d1 <= csr_read;
-            
-                if (csr_read_d1) begin
-                    csr_read_data_reg <= csr_readdata;
+                
+                flash_read_d1 <= flash_read;
+                
+                if (flash_read_d1) begin
+                    data_readdatavalid_reg <= 0;
+                end else if (data_readdatavalid) begin
+                    data_readdatavalid_reg <= 1'b1;
+                end
+                
+                if (csr_read) begin
+                    csr0_data1 <= 0;
+                end else if (flash_read) begin
+                    csr0_data1 <= 1'b1;
+                end
+                    
+                if ((csr_read_d1) && (csr0_data1 == 0)) begin
+                    read_data_reg <= csr_readdata;
+                end else if ((csr0_data1) && (data_readdatavalid)) begin
+                    read_data_reg <= data_readdata;
                 end
                 
             end
@@ -261,19 +296,23 @@ module wb_flash_loader #(REG_ADDR_DATA0,
                         
             casex (read_addr)  // synthesis parallel_case 
                 REG_ADDR_DATA0 : begin
-                    dat_o_mux = csr_read_data_reg [7 : 0];
+                    dat_o_mux = read_data_reg [7 : 0];
                 end
             
                 REG_ADDR_DATA1 : begin
-                    dat_o_mux = csr_read_data_reg [15 : 8];
+                    dat_o_mux = read_data_reg [15 : 8];
                 end
                 
                 REG_ADDR_DATA2 : begin
-                    dat_o_mux = csr_read_data_reg [23 : 16];
+                    dat_o_mux = read_data_reg [23 : 16];
                 end
                 
                 REG_ADDR_DATA3 : begin
-                    dat_o_mux = csr_read_data_reg [31 : 24];
+                    dat_o_mux = read_data_reg [31 : 24];
+                end
+                
+                REG_ADDR_CSR : begin
+                    dat_o_mux = csr_return;
                 end
                 
                 default : begin
@@ -293,7 +332,7 @@ module wb_flash_loader #(REG_ADDR_DATA0,
         .avmm_csr_readdata (csr_readdata),
         
         .avmm_data_addr (onchip_flash_address),
-        .avmm_data_read (1'b0),
+        .avmm_data_read (flash_read_d1),
         .avmm_data_writedata (flash_data_to_write),
         .avmm_data_write (flash_buffer_enable_out_d1),
         .avmm_data_readdata (data_readdata),
@@ -333,6 +372,8 @@ module wb_flash_loader #(REG_ADDR_DATA0,
     always_ff @(posedge clk, negedge reset_n) begin : onchip_flash_address_proc
         if (!reset_n) begin
             onchip_flash_address <= 0;
+        end else if (flash_read) begin
+            onchip_flash_address <= {csr_data_reg3, csr_data_reg2, csr_data_reg1, csr_data_reg0};
         end else if (ctl_load_onchip_flash_address) begin
             onchip_flash_address <= onchip_write_begin_addr;
         end else if (ctl_inc_onchip_flash_address) begin
@@ -361,7 +402,7 @@ module wb_flash_loader #(REG_ADDR_DATA0,
     always_ff @(posedge clk, negedge reset_n) begin : flash_buffer_ping_state_proc
         if (!reset_n) begin
             flash_buffer_ping_state <= 0;
-        end else if (ctl_clear_ping_state) begin
+        end else if (ctl_clear_ping_state | buf_fill_start) begin
             flash_buffer_ping_state <= FLASH_BUF_IDLE;
         end else if (flash_buffer_write_enable && (flash_buffer_write_address == 0)) begin
             flash_buffer_ping_state <= FLASH_BUF_BUSY;
@@ -374,7 +415,7 @@ module wb_flash_loader #(REG_ADDR_DATA0,
     always_ff @(posedge clk, negedge reset_n) begin : flash_buffer_pong_state_proc
         if (!reset_n) begin
             flash_buffer_pong_state <= 0;
-        end else if (ctl_clear_pong_state) begin
+        end else if (ctl_clear_pong_state | buf_fill_start) begin
             flash_buffer_pong_state <= FLASH_BUF_IDLE;
         end else if (flash_buffer_write_enable && (flash_buffer_write_address == (FLASH_LOADER_SEGMENT_SIZE_BYTES / 4))) begin
             flash_buffer_pong_state <= FLASH_BUF_BUSY;
@@ -388,7 +429,15 @@ module wb_flash_loader #(REG_ADDR_DATA0,
         if (!reset_n) begin
             ping_busy <= 0;
             pong_busy <= 0;
+            
+            flash_buffer_ping_state_out <= 0;
+            flash_buffer_pong_state_out <= 0;
+        
         end else begin
+            
+            flash_buffer_ping_state_out <= flash_buffer_ping_state;
+            flash_buffer_pong_state_out <= flash_buffer_pong_state;
+                    
             if (ctl_set_ping_free) begin
                 ping_busy <= 0;
             end else if (ctl_set_ping_busy) begin
@@ -436,8 +485,18 @@ module wb_flash_loader #(REG_ADDR_DATA0,
     end : segment_buffer_read_proc
     
 
-    assign active_flag = 0;
+    always_ff @(posedge clk, negedge reset_n) begin : active_flag_proc
+        if (!reset_n) begin
+            active_flag_reg <= 0;    
+        end else if (buf_fill_start) begin
+            active_flag_reg <= 1'b1;
+        end else if (done) begin
+            active_flag_reg <= 0;
+        end
+    end : active_flag_proc
+    
     assign done_flag = done_reg;
+    assign active_flag = active_flag_reg;
     
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // FSM main

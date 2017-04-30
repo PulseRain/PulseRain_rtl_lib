@@ -27,7 +27,7 @@
 `default_nettype none
 
 module wb_Serial_8051
-        #(parameter STABLE_TIME, MAX_BAUD_PERIOD, REG_ADDR_SCON, REG_ADDR_SBUF) (
+        #(parameter STABLE_TIME, MAX_BAUD_PERIOD, REG_ADDR_SCON, REG_ADDR_SBUF, FIFO_SIZE = 4) (
     
     //=======================================================================
     // clock / reset
@@ -70,11 +70,11 @@ module wb_Serial_8051
         logic unsigned [DATA_WIDTH - 1 : 0]         dat_o_mux;  
                 
         wire  unsigned [DATA_WIDTH - 1 : 0]         write_addr;
-		  // wire  unsigned [DATA_WIDTH - 1 : 0]         read_addr;
-		  
+          // wire  unsigned [DATA_WIDTH - 1 : 0]         read_addr;
+          
         
         logic                                       UART_start_TX;
-		//  logic                                       UART_start_RX;
+        //  logic                                       UART_start_RX;
     
         logic                                       UART_RI_d1, UART_TI_d1;
         wire                                        UART_RI, UART_TI;
@@ -88,7 +88,7 @@ module wb_Serial_8051
             
         wire                                        SCON_SM0, SCON_SM1, SCON_SM2, SCON_REN;
       //  wire                                        SCON_TB8;
-		//  wire                                        SCON_RB8;
+        //  wire                                        SCON_RB8;
         
        
         
@@ -155,7 +155,7 @@ module wb_Serial_8051
         end : UART_start_RX_proc
     */
         
-		  /*
+          /*
         always_ff @(posedge clk, negedge reset_n) begin : UART_start_RX_proc
             if (!reset_n) begin
                 UART_start_RX <= 0;
@@ -198,14 +198,14 @@ module wb_Serial_8051
                 SCON_d1 <= SCON;
             end
         end
-		  
-		             
+          
+                     
         assign SCON_SM0 = SCON[7];
-		  assign SCON_SM1 = SCON[6];
-		  assign SCON_SM2 = SCON[5];
-		  assign SCON_REN = SCON[4];
-		  assign SCON_TI  = SCON[1];
-		  assign SCON_RI  = SCON[0];
+        assign SCON_SM1 = SCON[6];
+        assign SCON_SM2 = SCON[5];
+        assign SCON_REN = SCON[4];
+        assign SCON_TI  = SCON[1];
+        assign SCON_RI  = SCON[0];
             
     //=======================================================================
     // UART 
@@ -254,7 +254,7 @@ module wb_Serial_8051
     //=======================================================================
         assign RI_rising = ((~UART_RI_d1) & UART_RI);
         
-        UART_RX_FIFO #(.FIFO_SIZE (4)) uart_rx_fifo_i (.*,
+        UART_RX_FIFO #(.FIFO_SIZE (FIFO_SIZE)) uart_rx_fifo_i (.*,
                 .fifo_write (RI_rising),
                 .fifo_data_in (UART_SBUF_received),
                 

@@ -44,7 +44,8 @@ module UART_RX_FIFO #(parameter FIFO_SIZE = 4, WIDTH = 8)(
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // Signals
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-        logic  [0 : FIFO_SIZE - 1][WIDTH - 1 : 0]       mem /* synthesis ramstyle = "logic" */ ;
+        logic  [0 : FIFO_SIZE - 1][WIDTH - 1 : 0]       mem;
+		  
         logic  unsigned [$clog2(FIFO_SIZE) - 1 : 0]     write_pointer = 0;
         logic  unsigned [$clog2(FIFO_SIZE) - 1 : 0]     read_pointer = 0;
        // wire   unsigned [$clog2(FIFO_SIZE) - 1 : 0]     next_write_pointer;

@@ -80,7 +80,7 @@ extern module UART_RX_FIFO #(parameter FIFO_SIZE = 4, WIDTH = 8)(
 );
     
 extern module wb_Serial_8051
-        #(parameter STABLE_TIME, MAX_BAUD_PERIOD, REG_ADDR_SCON, REG_ADDR_SBUF) (
+        #(parameter STABLE_TIME, MAX_BAUD_PERIOD, REG_ADDR_SCON, REG_ADDR_SBUF, FIFO_SIZE = 4) (
     
     //=======================================================================
     // clock / reset
