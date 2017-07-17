@@ -321,7 +321,7 @@ module M23XX1024 #(parameter CLK_SCK_RATIO = 6) (
                 
         enum {S_IDLE, S_INSTRUCTION, S_INST_SHIFT, S_NEXT_STAGE_AFTER_INST,
               S_ADDRESS_2, S_ADDRESS_1, S_ADDRESS_0, S_NEXT_STAGE_AFTER_ADDR,
-              S_WRITE, S_READ} states = 0;
+              S_WRITE, S_READ} states = S_IDLE;
                 
         localparam FSM_NUM_OF_STATES = states.num();
         logic [FSM_NUM_OF_STATES - 1:0] current_state = 0, next_state;

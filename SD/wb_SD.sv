@@ -20,8 +20,7 @@
 //    Wishbone wrapper for SD card
 //=============================================================================
 
-`include "common.svh"
-`include "SD_SPI.svh"
+//`include "SD_SPI.svh"
 
 `default_nettype none
 
@@ -55,10 +54,10 @@ module wb_SD #(parameter SD_CLK_SLOW_SCK_RATIO = 480,
             input  wire                                 stb_i,
             input  wire                                 we_i,
             
-            input  wire  unsigned [DATA_WIDTH - 1 : 0]  adr_wr_i,
-            input  wire  unsigned [DATA_WIDTH - 1 : 0]  adr_rd_i,
-            input  wire  unsigned [DATA_WIDTH - 1 : 0]  dat_i,
-            output wire  unsigned [DATA_WIDTH - 1 : 0]  dat_o,
+            input  wire  unsigned [8 - 1 : 0]  adr_wr_i,
+            input  wire  unsigned [8 - 1 : 0]  adr_rd_i,
+            input  wire  unsigned [8 - 1 : 0]  dat_i,
+            output wire  unsigned [8 - 1 : 0]  dat_o,
             output wire                                 ack_o,
     
         //=======================================================================

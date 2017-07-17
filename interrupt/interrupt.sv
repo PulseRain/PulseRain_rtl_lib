@@ -191,7 +191,7 @@ module interrupt
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 
         enum {S_IDLE, S_CHECK_PRIORITY, S_INT_LOCATE_LOW, S_INT_LOCATE_HIGH, 
-              S_DELAY_EXIT, S_DELAY_EXIT2, S_DELAY_EXIT3} states = 0;
+              S_DELAY_EXIT, S_DELAY_EXIT2, S_DELAY_EXIT3} states = S_IDLE;
                 
         localparam FSM_NUM_OF_STATES = states.num();
         logic [FSM_NUM_OF_STATES - 1:0] current_state = 0, next_state;

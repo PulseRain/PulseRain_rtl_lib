@@ -214,7 +214,7 @@ module SRT_Radix4_division #(parameter DATA_WIDTH = 8) (
     // FSM
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 
-        enum {S_IDLE, S_RUN, S_DONE} states = 0;
+        enum {S_IDLE, S_RUN, S_DONE} states = S_IDLE;
                 
         localparam FSM_NUM_OF_STATES = states.num();
         logic [FSM_NUM_OF_STATES - 1:0] current_state = 0, next_state;

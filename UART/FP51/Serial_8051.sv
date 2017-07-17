@@ -252,7 +252,7 @@ module Serial_8051 #(parameter STABLE_TIME, MAX_BAUD_PERIOD) (
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 
         enum {S_IDLE, S_RX_START, S_TX_START, S_RX_START_BIT, S_RX_DATA, 
-              S_TX_DATA, S_RX_STOP_BIT, S_TX_WAIT, S_TX_WAIT2} states = 0;
+              S_TX_DATA, S_RX_STOP_BIT, S_TX_WAIT, S_TX_WAIT2} states = S_IDLE;
                 
         localparam FSM_NUM_OF_STATES = states.num();
         logic [FSM_NUM_OF_STATES - 1:0] current_state = 0, next_state;

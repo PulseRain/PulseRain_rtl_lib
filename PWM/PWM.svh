@@ -13,44 +13,49 @@
 # Please contact PulseRain Technology LLC (www.pulserain.com) for more detail.
 #
 ###############################################################################
- */
+*/
 
-`ifndef SI3000_SVH
-`define SI3000_SVH
+
+`ifndef PWM_SVH
+`define PWM_SVH
 
 `include "common.svh"
 
-extern module Si3000 #(parameter MCLK_DENOM = 8, MCLK_NUMER = 375, WORD_SIZE = 16) (
-
+    parameter unsigned [2 : 0] PWM_SUB_ADDR_RESOLUTION_LOW = 3'b000;
+    parameter unsigned [2 : 0] PWM_SUB_ADDR_RESOLUTION_HIGH  = 3'b001;
+    
+    parameter unsigned [2 : 0] PWM_SUB_ADDR_REG_ON  = 3'b010;
+    parameter unsigned [2 : 0] PWM_SUB_ADDR_REG_OFF  = 3'b011;
+    
+    parameter unsigned [2 : 0] PWM_SUB_ADDR_SYNC_RESET = 3'b100;
+    
+    
+    
+extern module PWM_core  (
+    //=======================================================================
+    // clock / reset
+    //=======================================================================
+        
     input   wire                                clk,
     input   wire                                reset_n,
     
     input   wire                                sync_reset,
-    input   wire                                mclk_enable,
 
-    input   wire unsigned [15 : 0]              write_data,
+    //=======================================================================
+    // PWM 
+    //=======================================================================
     
-    output  logic                               write_data_grasp,
-    output  logic unsigned [15 : 0]             read_data,
-    output  logic                               done,
-    
-    input   wire                                Si3000_SDO,
-    output  wire                                Si3000_SDI,
-
-    input   wire                                Si3000_SCLK,
-    input   wire                                Si3000_FSYNC_N,
-    
-    output  wire                                Si3000_MCLK,
-    output  wire                                fsync_out
-
+    input   wire                                pwm_pulse,
+    input   wire unsigned [7 : 0]               pwm_on_reg,
+    input   wire unsigned [7 : 0]               pwm_off_reg,
+  
+    output  logic                               pwm_out
 );
-
-extern module wb_Si3000 #(parameter MCLK_DENOM = 1, MCLK_NUMER = 24, WORD_SIZE = 16,
-        REG_ADDR_WRITE_DATA_LOW,
-        REG_ADDR_WRITE_DATA_HIGH,
-        REG_ADDR_READ_DATA_LOW,
-        REG_ADDR_READ_DATA_HIGH,
-        REG_ADDR_CSR) (
+    
+extern module wb_PWM #(parameter NUM_OF_PWM, 
+                      REG_ADDR_CSR,
+                      REG_ADDR_DATA
+                      ) (
 
         
         //=======================================================================
@@ -74,20 +79,11 @@ extern module wb_Si3000 #(parameter MCLK_DENOM = 1, MCLK_NUMER = 24, WORD_SIZE =
         output wire                                 ack_o,
     
         //=======================================================================
-        // interrupt
+        // PWM output
         //=======================================================================
-        output logic                                fsync_pulse,
+        output wire unsigned [NUM_OF_PWM - 1 : 0]    pwm_out 
         
-        //=======================================================================
-        // Si3000 pins
-        //=======================================================================
-        
-        input   wire                                Si3000_SDO,
-        output  wire                                Si3000_SDI,
-        input   wire                                Si3000_SCLK,
-        output  wire                                Si3000_MCLK,
-        input   wire                                Si3000_FSYNC_N,
-        output  logic                               Si3000_RESET_N
 );
 
+    
 `endif

@@ -255,7 +255,7 @@ module Si3000 #(parameter MCLK_DENOM = 1, MCLK_NUMER = 24, WORD_SIZE = 16) (
     // FSM
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
                 
-        enum {S_IDLE, S_DATA_RW, S_END} states = 0;
+        enum {S_IDLE, S_DATA_RW, S_END} states = S_IDLE;
                 
         localparam FSM_NUM_OF_STATES = states.num();
         logic [FSM_NUM_OF_STATES - 1:0] current_state = 0, next_state;
