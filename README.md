@@ -3,8 +3,6 @@ PulseRain rtl library, which includes the following modules:
 
 *) ADC: ADC for Altera MAX10
 
-*) BCD: Binary Codec Decimal
-
 *) block_memory: BRAM inferred
 
 *) chip_ID: chip ID for Altera MAX 10
@@ -23,13 +21,14 @@ PulseRain rtl library, which includes the following modules:
 
 *) SRAM: Serial SRAM
 
-*) SRT_DIV: radix 4 SRT division
-
 *) switch_debouncer: button debouncer
 
 *) timer: 8051 timer
 
 *) UART: Async Serial port for 8051
 
+*) I2C: I2C master and slave
+
+*) PWM: Pulse Width Modulation
 
 
