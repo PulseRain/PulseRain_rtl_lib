@@ -47,7 +47,7 @@ extern module rotary_encoder # (parameter COUNTER_BITS = 8, DEBOUNCE_DELAY = 100
     output  wire  unsigned [COUNTER_BITS - 1 : 0]   counter_out
 );
 
-extern wb_rotary_encoder #(parameter REG_ADDR_COUNTER, COUNTER_BITS = 8, DEBOUNCE_DELAY = 100000, COUNTER_CLK_DECREASE = 1
+extern module wb_rotary_encoder #(parameter REG_ADDR_COUNTER, COUNTER_BITS = 8, DEBOUNCE_DELAY = 100000, COUNTER_CLK_DECREASE = 1
                       ) (
 
         
