@@ -54,9 +54,6 @@ module rotary_encoder # (parameter COUNTER_BITS = 8, DEBOUNCE_DELAY = 100000, CO
         logic                                       encoder_clk_i_d1;
         logic unsigned [COUNTER_BITS - 1 : 0]       counter;                 
     
-        logic unsigned [3 : 0]                      encoder_clk_sr;
-        logic unsigned [3 : 0]                      encoder_dt_sr;
-        
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     // button debouncer
     //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -74,9 +71,6 @@ module rotary_encoder # (parameter COUNTER_BITS = 8, DEBOUNCE_DELAY = 100000, CO
                 .data_out (encoder_dt_i)
             );
 
-        
-      //      assign encoder_clk_i = encoder_clk_sr[$high(encoder_clk_sr)];
-      //      assign encoder_dt_i = encoder_dt_sr[$high(encoder_dt_sr)];
             
             switch_debouncer   #(.TIMER_VALUE(DEBOUNCE_DELAY)) encoder_sw_debounce_i (
                             .clk (clk),
@@ -92,14 +86,8 @@ module rotary_encoder # (parameter COUNTER_BITS = 8, DEBOUNCE_DELAY = 100000, CO
             always_ff @(posedge clk, negedge reset_n) begin : delay_proc
                 if (!reset_n) begin
                     encoder_clk_i_d1 <= 0;
-                    encoder_clk_sr <= 0;
-                    encoder_dt_sr <= 0;
-                    
                 end else begin
                     encoder_clk_i_d1 <= encoder_clk_i;
-                    encoder_clk_sr <= {encoder_clk_sr [$high(encoder_clk_sr) - 1 : 0], encoder_clk};
-                    encoder_dt_sr <= {encoder_dt_sr [$high(encoder_dt_sr) - 1 : 0], encoder_dt};
-                    
                 end
             end : delay_proc
     
