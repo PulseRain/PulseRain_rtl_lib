@@ -32,3 +32,5 @@ PulseRain rtl library, which includes the following modules:
 *) PWM: Pulse Width Modulation
 
 *) Rotary Encoder
+
+*) PS2
