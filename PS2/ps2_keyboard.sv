@@ -68,8 +68,8 @@ module ps2_keyboard (
                 ps2_clk_sr <= 0;
                 ps2_dat_sr <= 0;
             end else begin
-                ps2_clk_sr <= {ps2_clk_sr[$high(ps2_clk_sr) - 1 : 0] & ps2_clk};
-                ps2_dat_sr <= {ps2_dat_sr[$high(ps2_dat_sr) - 1 : 0] & ps2_dat};
+                ps2_clk_sr <= {ps2_clk_sr[$high(ps2_clk_sr) - 1 : 0], ps2_clk};
+                ps2_dat_sr <= {ps2_dat_sr[$high(ps2_dat_sr) - 1 : 0], ps2_dat};
             end
         end : sr_proc
         
