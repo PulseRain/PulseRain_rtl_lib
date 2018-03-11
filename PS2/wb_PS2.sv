@@ -84,6 +84,9 @@ module wb_PS2 #(parameter REG_ADDR_CSR, REG_ADDR_DATA) (
         //logic  unsigned [2 : 0]                     ps2_keyboard_enable_out_sr;
         logic unsigned [DATA_WIDTH - 1 : 0]         dat_o_mux;
         
+        wire                                        fifo_not_empty;
+        wire unsigned [DATA_WIDTH - 1 : 0]          fifo_top_data_out;
+        
     //=======================================================================
     // registers and flags
     //=======================================================================
@@ -135,8 +138,8 @@ module wb_PS2 #(parameter REG_ADDR_CSR, REG_ADDR_DATA) (
         always_ff @(posedge clk, negedge reset_n) begin : data_out_reg_proc
             if (!reset_n) begin
                 data_out_reg <= 0;
-            end else if (ps2_keyboard_enable_out) begin
-                data_out_reg <= ps2_keyboard_data_out;
+            end else begin
+                data_out_reg <= fifo_top_data_out;
             end;
         end : data_out_reg_proc
         
@@ -145,7 +148,7 @@ module wb_PS2 #(parameter REG_ADDR_CSR, REG_ADDR_DATA) (
                 data_available <= 0;
             end else if (int_clear) begin
                 data_available <= 0;
-            end else if (ps2_keyboard_enable_out) begin
+            end else if (fifo_not_empty) begin
                 data_available <= 1'b1;
             end 
         
@@ -184,6 +187,18 @@ module wb_PS2 #(parameter REG_ADDR_CSR, REG_ADDR_DATA) (
 
             endcase
         end
+        
+        PS2_FIFO ps2_fifo_i (.*,
+            .fifo_write (ps2_keyboard_enable_out),
+            .fifo_data_in (ps2_keyboard_data_out),
+            
+            .fifo_read (int_clear),
+            .fifo_top_data_out (fifo_top_data_out),
+            
+            .fifo_not_empty (fifo_not_empty),
+            .fifo_full (),
+            .fifo_count ()
+        );
 
         ps2_keyboard ps2_keyboard_i (.*,
             .sync_reset (ps2_sync_reset),
