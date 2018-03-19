@@ -76,6 +76,7 @@ module wb_LCD #(parameter REG_ADDR_CSR, REG_ADDR_DATA) (
         logic                                       data_load;
         wire                                        done;
         logic                                       lcd_done;
+        wire                                        sync_reset;
         
     //=======================================================================
     // registers and flags
@@ -136,10 +137,11 @@ module wb_LCD #(parameter REG_ADDR_CSR, REG_ADDR_DATA) (
         end : lcd_done_proc
 
         assign dcx = lcd_csr[0];
-        assign rst = lcd_csr[1];
+        assign rst = ~lcd_csr[1];
+        assign sync_reset = lcd_csr[1];
         
         ST7735R ST7735R_i (.*,
-            .sync_reset (rst),
+            .sync_reset (sync_reset),
             
             .data_load (data_load),
             .data (lcd_data),
