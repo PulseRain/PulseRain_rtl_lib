@@ -19,7 +19,7 @@
 
 `default_nettype none
 
-module ST7735R # (parameter DIV_COUNTER_BITS = 4) (
+module ST7735R # (parameter DIV_COUNTER_BITS = 3) (
     //=======================================================================
     // clock / reset
     //=======================================================================
