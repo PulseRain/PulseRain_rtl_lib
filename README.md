@@ -25,7 +25,7 @@ PulseRain rtl library, which includes the following modules:
 
 *) timer: 8051 timer
 
-*) UART: Async Serial port for 8051
+*) UART: Async Serial port
 
 *) I2C: I2C master and slave
 
